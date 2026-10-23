@@ -352,6 +352,41 @@ async def evaluate_speaking(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception:
                 logger.exception("Gemini audio faylini o‘chirishda xatolik")
 
+        response = model.generate_content(prompt)
+
+        if response.text:
+            result = response.text
+
+            # Telegram xabar limiti uchun bo‘lib yuborish
+            max_length = 4000
+
+            for i in range(0, len(result), max_length):
+                await update.message.reply_text(
+                    result[i:i + max_length]
+                )
+
+        else:
+            await update.message.reply_text(
+                "❌ AI javob qaytarmadi. "
+                "Iltimos, qaytadan urinib ko‘ring."
+            )
+
+    except Exception as e:
+        logger.error(
+            "Gemini xatosi: %s",
+            e,
+            exc_info=True
+        )
+
+        await update.message.reply_text(
+            "❌ Baholash vaqtida xatolik yuz berdi.\n\n"
+            "Birozdan keyin qayta urinib ko‘ring."
+        )
+
+
+# =========================
+# MAIN
+# =========================
 
 # =========================
 # MAIN
